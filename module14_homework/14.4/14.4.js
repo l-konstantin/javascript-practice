@@ -14,7 +14,7 @@ URL https://picsum.photos/200/300, где первое число — ширин
 https://picsum.photos/150/200.
 После получения данных вывести ниже картинку на экран.
 */
-const btnNode = document.querySelector('.j-result');
+const btnNode = document.querySelector('.j-btn-request');
 const content = document.querySelector('.content');
 
 btnNode.addEventListener('click', () => {
@@ -22,12 +22,12 @@ btnNode.addEventListener('click', () => {
   const input2 = document.querySelector('input[name=input2]').value;
 
   if (input1 >= 100 && input1 <= 300 && input2 >= 100 && input2 <= 300) {
-    fetch(`https://picsum.photos/${input1}/${input2}`, response)
+    fetch(`https://picsum.photos/${input1}/${input2}`)
       .then((response) => {
         console.log('response', response);
       })
       .then((data) => {
-        let cards = '';
+        let cards = "";
         data.forEach(item => {
           let cardBlock = `<div class="card">
                                 <img src="${item.download_url}" class="card-image" />
