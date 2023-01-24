@@ -14,30 +14,60 @@ URL https://picsum.photos/200/300, где первое число — ширин
 https://picsum.photos/150/200.
 После получения данных вывести ниже картинку на экран.
 */
+
+function useRequest(url) {
+  const options = {
+    method: 'GET',
+    mode: 'cors'
+  };
+  fetch(url, options)
+    .then((response) => {
+      console.log("responce", response);
+      let url = response.url;
+      console.log(url);
+      return url;
+    })
+    .then((url) => {
+      let cards = "";
+      const cardBlock = `<div class="card">
+        <img src="${url}" class="card-image" />
+      </div>`;
+      console.log(`${url}`);
+      cards = cards + cardBlock;
+      console.log(cards);
+      resultRequest.innerHTML = cards;
+    })
+    .catch(() => {
+      console.log('error');
+    });
+};
+
+function deleteError() {
+  const divErrorInput = document.querySelector(".error");
+  divErrorInput.innerHTML = " ";
+}
+
+function error() {
+  const divEr = document.querySelector(".error");
+  const error = `<div class="error_number"><p>Число или числа вне диапазона от 100 до 300</p></div>`;
+  divEr.innerHTML = error;
+};
+
+const resultRequest = document.querySelector(".content");
 const btnNode = document.querySelector('.j-btn-request');
-const content = document.querySelector('.content');
 
-btnNode.addEventListener('click', () => {
-  const input1 = document.querySelector('input[name=input1]').value;
-  const input2 = document.querySelector('input[name=input2]').value;
+btnNode.addEventListener("click", async (e) => {
+  console.log("start");
+  const value1 = `${document.querySelector('.limit').value}`;
+  const value2 = `${document.querySelector('.limit').value}`;
 
-  if (input1 >= 100 && input1 <= 300 && input2 >= 100 && input2 <= 300) {
-    fetch(`https://picsum.photos/${input1}/${input2}`)
-      .then((response) => {
-        console.log('response', response);
-      })
-      .then((data) => {
-        let cards = "";
-        data.forEach(item => {
-          let cardBlock = `<div class="card">
-                                <img src="${item.download_url}" class="card-image" />
-                             </div>`;
-          cards = cards + cardBlock;                   
-        });
-        content.innerHTML = cards;
-      })
-      .catch(() => { console.log('error') })
+  if (value1 >= 100 && value1 <= 300 && value2 >= 100 && value2 <= 300) {
+    let valueUrl = `https://picsum.photos/${value1}/${value2}`;
+    const requestResult = await useRequest(valueUrl);
+    console.log("Значение", valueUrl);
+    console.log("end");
   } else {
-    console.log("одно из чисел вне диапазона от 100 до 300");
+    error();
   }
-});
+})
+

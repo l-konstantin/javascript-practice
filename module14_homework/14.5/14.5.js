@@ -33,37 +33,29 @@ function useRequest(url,cb) {
 
     xhr.onload = function() {
         if(xhr.status !=200) {
-    console.log('Статус ответа:' `${xhr.status}`)
+            console.log('Статус ответа:' `${xhr.status}`)
         } else {
-    let result = JSON.parse(xhr.response);
+            let result = JSON.parse(xhr.response);
     
-    console.log("Результат:", JSON.parse(xhr.response));
-    if(cb) {
-        cb(result);
-     }
-    } 
-};
+            console.log("Результат:", JSON.parse(xhr.response));
+            if(cb) {
+                cb(result);
+            }
+        } 
+    };
     xhr.onerror = function(){
-    console.log("Ошибка! Статус ответа:", xhr.status);
+        console.log("Ошибка! Статус ответа:", xhr.status);
     };
 
     xhr.send();
 };
-
-// Ищем ноду для вставки результата запроса
-const resultNode = document.querySelector('.result-content');
-//input
-const value1 = document.querySelector('.limit_1');
-const value2 = document.querySelector('.limit_2');
-// Ищем кнопку, по нажатии на которую будет запрос
-const btnNode = document.querySelector('.btn-submit');
 
 function displayResult(apiData) {
     let cards = "";
         apiData.forEach((item, index, array) => {
         const cardBlock = `
             <div class="card">
-                <img src="${item.download_url}" class="card-image"/>
+                <img src="${item.download_url}" style="width: 200px;" class="card-image"/>
                 <p>${item.author}</p>
             </div>
             `;
@@ -74,6 +66,58 @@ function displayResult(apiData) {
     resultRequest.innerHTML = cards;
 }
 
-btnNode.addEventListener('click', () => {
-    useRequest(`https://picsum.photos/v2/list?page=${value1}&limit=${value2}`, displayResult);
+const showImages = () => {
+    const images = localStorage.getItem("localDiv");
+    if (images) {
+        const imageDivLocalStorage = document.querySelector('.result-content');
+        imageDivLocalStorage.insertAdjacentHTML('afterend',images);
+        console.log("После получения запроса, данные LocalStorage - будут удалены через 30 секунд");
+        setTimeout(clearStorage,3000);
+    } else {
+        console.log("пустота");
+    }
+}
+
+document.addEventListener("DOMContentLoaded", showImages);
+
+function clearStorage() {
+    localStorage.clear();
+}
+
+function deleteError() {
+    const divErrorInput = document.querySelector(".error");
+    divErrorInput.innerHTML = " ";
+}
+
+function error(message) {
+    const errorMessage = message;
+    const divEr = document.querySelector(".error");
+    const error = `<div class="error_number><p> ${errorMessage} вне диапазона от 1 до 10</p></div>`;
+    divEr.innerHTML = error;
+
+    setTimeout(deleteError,2000);
+}
+
+const resultRequest = document.querySelector('.result-content');
+const btnNode = document.querySelector('.btn-submit');
+
+btnNode.addEventListener('click', async (e) => {
+    console.log("start");
+    let value1 = `${document.querySelector('.limit_1').value}`;
+    let value2 = `${document.querySelector('.limit_2').value}`;
+
+    if (value1 > 10 || value1 < 1) {
+        if (value2 > 10 || value2 < 1) {
+            error ("Номер страныцы и лимит");
+        } else {
+            error("Номер страницы");
+        }
+    } else if (value2 > 10 || value2 < 1) {
+        error ("Лимит");
+    } else {
+        let valueUrl = `https://picsum.photos/v2/list?page=${value1}&limit=${value2}`;
+        const requestResult = useRequest(valueUrl, displayResult);
+        console.log("Значение", valueUrl);
+        console.log("end");
+    }    
 });
